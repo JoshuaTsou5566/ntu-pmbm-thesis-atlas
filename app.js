@@ -342,6 +342,12 @@ const applyFilters = () => {
   const year = elements.yearFilter.value;
   const advisor = elements.advisorFilter.value;
 
+  if (elements.dashboardYearFilter.value !== year) {
+    elements.dashboardYearFilter.value = year;
+    state.dashboardYear = year;
+    renderCharts();
+  }
+
   state.filtered = state.theses.filter((item) => {
     const matchesTheme = !theme || item.theme_primary === theme;
     const matchesYear = !year || item.year === year;
@@ -431,7 +437,9 @@ const bindEvents = () => {
   );
   elements.dashboardYearFilter.addEventListener("change", () => {
     state.dashboardYear = elements.dashboardYearFilter.value;
+    elements.yearFilter.value = state.dashboardYear;
     renderCharts();
+    applyFilters();
   });
   elements.searchInput.addEventListener("input", applyFilters);
   elements.clearFilters.addEventListener("click", () => {
