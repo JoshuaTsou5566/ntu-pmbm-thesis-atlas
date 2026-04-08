@@ -23,6 +23,7 @@ const elements = {
   themeYearHeatmap: document.querySelector("#theme-year-heatmap"),
   advisorThemeHeatmap: document.querySelector("#advisor-theme-heatmap"),
   keywordVisualization: document.querySelector("#keyword-visualization"),
+  activeFilters: document.querySelector("#active-filters"),
   advisorDirectory: document.querySelector("#advisor-directory"),
   themeFilter: document.querySelector("#theme-filter"),
   yearFilter: document.querySelector("#year-filter"),
@@ -274,7 +275,12 @@ const renderDonutChart = (
 const renderHeatmap = (container, columns, rows, getValue, onCellClick, isSelected) => {
   container.replaceChildren();
   const values = [];
-  rows.forEach((row) => columns.forEach((col) => values.push(getValue(row, col))));
+  rows.forEach((row) =>
+    columns.forEach((col) => {
+      const cellData = getValue(row, col);
+      values.push(typeof cellData === "number" ? cellData : cellData.value);
+    })
+  );
   const max = Math.max(...values, 1);
 
   const header = document.createElement("div");
@@ -296,17 +302,54 @@ const renderHeatmap = (container, columns, rows, getValue, onCellClick, isSelect
     label.textContent = row;
     rowEl.appendChild(label);
     columns.forEach((col) => {
-      const value = getValue(row, col);
+      const cellData = getValue(row, col);
+      const value = typeof cellData === "number" ? cellData : cellData.value;
       const cell = document.createElement("button");
       cell.type = "button";
       cell.className = `heatmap-cell ${isSelected(row, col) ? "is-selected" : ""}`;
       cell.style.background = `rgba(23, 76, 79, ${0.08 + (value / max) * 0.72})`;
       cell.style.color = value / max > 0.52 ? "#fffaf3" : "var(--deep)";
       cell.textContent = value ? String(value) : "-";
+      if (cellData && typeof cellData === "object" && cellData.tooltip) {
+        cell.dataset.tooltip = cellData.tooltip;
+      }
       cell.addEventListener("click", () => onCellClick(row, col));
       rowEl.appendChild(cell);
     });
     container.appendChild(rowEl);
+  });
+};
+
+const renderActiveFilters = () => {
+  elements.activeFilters.replaceChildren();
+  const items = [
+    ["主題", elements.themeFilter.value, () => setFilters({ theme: "" })],
+    ["年份", elements.yearFilter.value, () => setFilters({ year: "" })],
+    ["指導教授", elements.advisorFilter.value, () => setFilters({ advisor: "" })],
+    ["搜尋", safeText(elements.searchInput.value), () => setFilters({ query: "" })],
+  ].filter((item) => item[1]);
+
+  if (items.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "empty-state";
+    empty.textContent = "目前未套用篩選條件。";
+    elements.activeFilters.appendChild(empty);
+    return;
+  }
+
+  items.forEach(([label, value, clear]) => {
+    const pill = document.createElement("div");
+    pill.className = "filter-pill";
+    pill.innerHTML = `<span><strong>${label}</strong> ${value}</span>`;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = "×";
+    button.addEventListener("click", () => {
+      clear();
+      applyFilters();
+    });
+    pill.appendChild(button);
+    elements.activeFilters.appendChild(pill);
   });
 };
 
@@ -432,8 +475,18 @@ const renderHeatmaps = () => {
     elements.themeYearHeatmap,
     allYears,
     themeRows,
-    (theme, year) =>
-      state.theses.filter((item) => item.theme_primary === theme && item.year === year).length,
+    (theme, year) => {
+      const matches = state.theses.filter(
+        (item) => item.theme_primary === theme && item.year === year
+      );
+      return {
+        value: matches.length,
+        tooltip:
+          matches.length > 0
+            ? `${theme}｜${year}\n${matches.length} 篇\n例如：${matches[0].title_zh}`
+            : `${theme}｜${year}\n0 篇`,
+      };
+    },
     (theme, year) => {
       setFilters({
         theme: toggleFilterValue(elements.themeFilter.value, theme),
@@ -450,10 +503,18 @@ const renderHeatmaps = () => {
     elements.advisorThemeHeatmap,
     themesForAdvisor,
     advisorRows,
-    (advisor, theme) =>
-      state.theses.filter(
+    (advisor, theme) => {
+      const matches = state.theses.filter(
         (item) => item.advisor_name === advisor && item.theme_primary === theme
-      ).length,
+      );
+      return {
+        value: matches.length,
+        tooltip:
+          matches.length > 0
+            ? `${advisor}｜${theme}\n${matches.length} 篇\n例如：${matches[0].title_zh}`
+            : `${advisor}｜${theme}\n0 篇`,
+      };
+    },
     (advisor, theme) => {
       setFilters({
         advisor: toggleFilterValue(elements.advisorFilter.value, advisor),
@@ -546,6 +607,7 @@ const applyFilters = () => {
     return matchesTheme && matchesYear && matchesAdvisor && matchesSearch;
   });
 
+  renderActiveFilters();
   renderResults();
 };
 

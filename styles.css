@@ -196,6 +196,10 @@ button:hover {
   margin-top: 26px;
 }
 
+.filter-state-section {
+  margin-top: 26px;
+}
+
 .panel {
   border-radius: 24px;
   padding: 22px;
@@ -216,6 +220,35 @@ button:hover {
 .theme-summary {
   display: grid;
   gap: 12px;
+}
+
+.active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(23, 76, 79, 0.14);
+  background: rgba(217, 236, 228, 0.7);
+}
+
+.filter-pill strong {
+  color: var(--deep);
+}
+
+.filter-pill button {
+  border: none;
+  background: transparent;
+  color: var(--warm);
+  padding: 0;
+  font-weight: 700;
 }
 
 .theme-row {
@@ -526,6 +559,37 @@ button:hover {
   border: 1px solid rgba(23, 76, 79, 0.08);
   cursor: pointer;
   transition: transform 180ms ease, background-color 180ms ease;
+}
+
+.heatmap-cell[data-tooltip] {
+  position: relative;
+}
+
+.heatmap-cell[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%) translateY(4px);
+  min-width: 140px;
+  max-width: 220px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(31, 42, 43, 0.92);
+  color: #fffaf3;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  text-align: left;
+  white-space: normal;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms ease, transform 150ms ease;
+  z-index: 20;
+}
+
+.heatmap-cell[data-tooltip]:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
 
 .heatmap-cell:hover {
