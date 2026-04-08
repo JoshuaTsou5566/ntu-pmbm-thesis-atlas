@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>郭瑞祥｜NTU 生技管理論文地圖</title>
+    <link rel="stylesheet" href="../styles.css" />
+  </head>
+  <body class="advisor-page">
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Advisor Profile</p>
+          <h1 id="advisor-name">郭瑞祥</h1>
+          <p id="advisor-english" class="intro">Ruey-Shan Guo</p>
+          <div class="hero-actions">
+            <a class="primary-button" href="../index.html">回首頁</a>
+          </div>
+        </div>
+        <div class="hero-panel">
+          <div class="stat-card">
+            <span class="stat-label">指導論文數</span>
+            <strong id="advisor-total">-</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">年份範圍</span>
+            <strong id="advisor-years">-</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">涵蓋主題</span>
+            <strong id="advisor-theme-count">-</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">熱門關鍵字</span>
+            <strong id="advisor-keywords">-</strong>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <section class="advisor-dashboard">
+          <article class="panel">
+            <div class="panel-heading">
+              <h2>年度分布</h2>
+              <p>這位指導教授的論文在各年份的分布。</p>
+            </div>
+            <div id="advisor-timeline" class="bar-chart year-chart"></div>
+          </article>
+          <article class="panel">
+            <div class="panel-heading">
+              <h2>主題分布</h2>
+              <p>觀察這位老師較常出現的研究方向。</p>
+            </div>
+            <div id="advisor-theme-chart" class="bar-chart"></div>
+          </article>
+        </section>
+
+        <section class="advisor-section">
+          <article class="panel">
+            <div class="panel-heading">
+              <h2>熱門關鍵字</h2>
+              <p>由這位指導教授的所有論文關鍵字彙整而成。</p>
+            </div>
+            <div id="advisor-keyword-cloud" class="advisor-keyword-cloud"></div>
+          </article>
+        </section>
+
+        <section class="results-section">
+          <div class="results-header">
+            <div>
+              <h2>指導論文列表</h2>
+              <p>含題名、主題與摘要摘錄。</p>
+            </div>
+          </div>
+          <div id="advisor-thesis-list" class="results-list"></div>
+        </section>
+      </main>
+    </div>
+    <script>window.__ADVISOR_SLUG__ = "郭瑞祥";</script>
+    <script src="../advisor.js" type="module"></script>
+  </body>
+</html>

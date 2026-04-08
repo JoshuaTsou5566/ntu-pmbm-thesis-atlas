@@ -77,6 +77,49 @@
           </article>
         </section>
 
+        <section class="dashboard-grid">
+          <article class="panel chart-panel">
+            <div class="panel-heading">
+              <h2>首頁圖表</h2>
+              <p>快速看主題與年份的分布輪廓。</p>
+            </div>
+            <div class="chart-stack">
+              <div>
+                <div class="mini-heading">
+                  <h3>主題篇數</h3>
+                  <p>按篇數由高到低</p>
+                </div>
+                <div id="theme-chart" class="bar-chart"></div>
+              </div>
+              <div>
+                <div class="mini-heading">
+                  <h3>年份趨勢</h3>
+                  <p>觀察各年度論文量變化</p>
+                </div>
+                <div id="year-chart" class="bar-chart year-chart"></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel keyword-panel">
+            <div class="panel-heading">
+              <h2>熱門關鍵字</h2>
+              <p>以所有中文關鍵字彙整，顯示最常出現的主題詞。</p>
+            </div>
+            <div id="keyword-visualization" class="keyword-visualization"></div>
+          </article>
+        </section>
+
+        <section class="advisor-section">
+          <article class="panel">
+            <div class="panel-heading">
+              <h2>指導教授頁面</h2>
+              <p>每位指導教授都有可單獨分享的頁面，適合從老師角度看研究主題與歷年論文。</p>
+            </div>
+            <div id="advisor-directory" class="advisor-directory"></div>
+          </article>
+        </section>
+
         <section id="results" class="results-section">
           <div class="results-header">
             <div>
@@ -96,8 +139,13 @@
           <span class="year-chip"></span>
           <span class="theme-chip"></span>
         </div>
-        <h3 class="thesis-title"></h3>
-        <p class="thesis-title-en"></p>
+        <div class="mobile-card-top">
+          <div class="mobile-card-copy">
+            <h3 class="thesis-title"></h3>
+            <p class="thesis-title-en"></p>
+          </div>
+          <a class="detail-link detail-link-inline" target="_blank" rel="noreferrer">原始頁面</a>
+        </div>
         <div class="meta-grid">
           <p><strong>作者</strong><span class="author"></span></p>
           <p><strong>指導教授</strong><span class="advisor"></span></p>
@@ -109,7 +157,10 @@
           <h4 class="abstract-heading">摘要</h4>
           <p class="abstract"></p>
         </div>
-        <a class="detail-link" target="_blank" rel="noreferrer">開啟論文頁面</a>
+        <div class="card-footer">
+          <a class="advisor-page-link" target="_self">查看指導教授頁</a>
+          <a class="detail-link" target="_blank" rel="noreferrer">開啟論文頁面</a>
+        </div>
       </article>
     </template>
 

@@ -3,6 +3,7 @@ const DATA_URL = "./data/theses.json";
 const state = {
   theses: [],
   filtered: [],
+  normalizedAdvisors: [],
   abstractLanguage: "zh",
 };
 
@@ -12,6 +13,10 @@ const elements = {
   statAdvisors: document.querySelector("#stat-advisors"),
   statYears: document.querySelector("#stat-years"),
   themeSummary: document.querySelector("#theme-summary"),
+  themeChart: document.querySelector("#theme-chart"),
+  yearChart: document.querySelector("#year-chart"),
+  keywordVisualization: document.querySelector("#keyword-visualization"),
+  advisorDirectory: document.querySelector("#advisor-directory"),
   themeFilter: document.querySelector("#theme-filter"),
   yearFilter: document.querySelector("#year-filter"),
   advisorFilter: document.querySelector("#advisor-filter"),
@@ -36,6 +41,38 @@ const uniqueSorted = (values) =>
     String(a).localeCompare(String(b), "zh-Hant")
   );
 
+const slugify = (value) =>
+  safeText(value)
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\w\u4e00-\u9fff-]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+
+const extractAdvisor = (item) => {
+  const rawZh = safeText(item.advisor_zh);
+  const rawEn = safeText(item.advisor_en);
+  const zhLine =
+    rawZh
+      .split(/\n+/)
+      .map((part) => part.trim())
+      .find((part) => /[\u4e00-\u9fff]/.test(part)) || rawZh || "未載明";
+  const englishLine =
+    rawEn ||
+    rawZh
+      .split(/\n+/)
+      .map((part) => part.trim())
+      .find((part) => part && !/[\u4e00-\u9fff]/.test(part)) ||
+    "";
+
+  return {
+    name: zhLine || "未載明",
+    english: englishLine,
+    slug: slugify(zhLine || "undisclosed"),
+  };
+};
+
 const createOption = (label, value = "") => {
   const option = document.createElement("option");
   option.value = value;
@@ -43,9 +80,20 @@ const createOption = (label, value = "") => {
   return option;
 };
 
+const normalizeRecords = (rows) =>
+  rows.map((item) => {
+    const advisor = extractAdvisor(item);
+    return {
+      ...item,
+      advisor_name: advisor.name,
+      advisor_english: advisor.english,
+      advisor_slug: advisor.slug,
+    };
+  });
+
 const hydrateFilters = () => {
   const themeOptions = uniqueSorted(state.theses.map((item) => item.theme_primary));
-  const advisorOptions = uniqueSorted(state.theses.map((item) => item.advisor_zh || "未載明"));
+  const advisorOptions = uniqueSorted(state.theses.map((item) => item.advisor_name));
   const yearOptions = uniqueSorted(state.theses.map((item) => item.year)).sort();
 
   elements.themeFilter.replaceChildren(createOption("全部主題", ""));
@@ -75,11 +123,122 @@ const renderSummary = () => {
     div.innerHTML = `
       <div>
         <strong>${theme}</strong>
-        <span>以題名、關鍵字與摘要做自動分群</span>
+        <span>依題名、關鍵字與摘要做規則式分群</span>
       </div>
       <strong>${count} 篇</strong>
     `;
     elements.themeSummary.appendChild(div);
+  });
+};
+
+const renderBarChart = (container, entries, colorClass = "") => {
+  container.replaceChildren();
+  const max = Math.max(...entries.map(([, value]) => value), 1);
+
+  entries.forEach(([label, value]) => {
+    const row = document.createElement("div");
+    row.className = `chart-row ${colorClass}`.trim();
+    row.innerHTML = `
+      <div class="chart-label">${label}</div>
+      <div class="chart-track">
+        <div class="chart-bar" style="width:${(value / max) * 100}%"></div>
+      </div>
+      <div class="chart-value">${value}</div>
+    `;
+    container.appendChild(row);
+  });
+};
+
+const renderCharts = () => {
+  const themeCounts = Object.entries(
+    state.theses.reduce((acc, item) => {
+      acc[item.theme_primary] = (acc[item.theme_primary] || 0) + 1;
+      return acc;
+    }, {})
+  ).sort((a, b) => b[1] - a[1]);
+
+  const yearCounts = Object.entries(
+    state.theses.reduce((acc, item) => {
+      acc[item.year] = (acc[item.year] || 0) + 1;
+      return acc;
+    }, {})
+  ).sort((a, b) => Number(a[0]) - Number(b[0]));
+
+  renderBarChart(elements.themeChart, themeCounts, "theme-bars");
+  renderBarChart(elements.yearChart, yearCounts, "year-bars");
+};
+
+const renderKeywords = () => {
+  const keywordCounts = state.theses.reduce((acc, item) => {
+    safeText(item.keywords_zh)
+      .split("；")
+      .map((keyword) => keyword.trim())
+      .filter(Boolean)
+      .forEach((keyword) => {
+        acc[keyword] = (acc[keyword] || 0) + 1;
+      });
+    return acc;
+  }, {});
+
+  const entries = Object.entries(keywordCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 24);
+
+  const max = Math.max(...entries.map(([, count]) => count), 1);
+  elements.keywordVisualization.replaceChildren();
+
+  entries.forEach(([keyword, count]) => {
+    const chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = "keyword-chip";
+    chip.style.setProperty("--keyword-scale", String(count / max));
+    chip.innerHTML = `<strong>${keyword}</strong><span>${count}</span>`;
+    chip.addEventListener("click", () => {
+      elements.searchInput.value = keyword;
+      applyFilters();
+      document.querySelector("#results").scrollIntoView({ behavior: "smooth" });
+    });
+    elements.keywordVisualization.appendChild(chip);
+  });
+};
+
+const renderAdvisorDirectory = () => {
+  const grouped = state.theses.reduce((acc, item) => {
+    if (!acc[item.advisor_slug]) {
+      acc[item.advisor_slug] = {
+        slug: item.advisor_slug,
+        name: item.advisor_name,
+        english: item.advisor_english,
+        count: 0,
+        themes: new Set(),
+      };
+    }
+    acc[item.advisor_slug].count += 1;
+    if (item.theme_primary) {
+      acc[item.advisor_slug].themes.add(item.theme_primary);
+    }
+    return acc;
+  }, {});
+
+  const cards = Object.values(grouped).sort((a, b) => b.count - a.count);
+  state.normalizedAdvisors = cards;
+  elements.advisorDirectory.replaceChildren();
+
+  cards.forEach((advisor) => {
+    const anchor = document.createElement("a");
+    anchor.className = "advisor-card";
+    anchor.href = `./advisors/${advisor.slug}.html`;
+    anchor.innerHTML = `
+      <div>
+        <strong>${advisor.name}</strong>
+        <p>${advisor.english || " "}</p>
+      </div>
+      <div class="advisor-card-meta">
+        <span>${advisor.count} 篇</span>
+        <small>${[...advisor.themes].slice(0, 2).join("、")}</small>
+      </div>
+    `;
+    elements.advisorDirectory.appendChild(anchor);
   });
 };
 
@@ -92,13 +251,15 @@ const applyFilters = () => {
   state.filtered = state.theses.filter((item) => {
     const matchesTheme = !theme || item.theme_primary === theme;
     const matchesYear = !year || item.year === year;
-    const matchesAdvisor = !advisor || (item.advisor_zh || "未載明") === advisor;
+    const matchesAdvisor = !advisor || item.advisor_name === advisor;
 
     const haystack = [
       item.title_zh,
       item.title_en,
       item.author_zh,
-      item.advisor_zh,
+      item.author_en,
+      item.advisor_name,
+      item.advisor_english,
       item.keywords_zh,
       item.keywords_en,
       item.abstract_zh,
@@ -135,7 +296,7 @@ const renderResults = () => {
     node.querySelector(".thesis-title").textContent = item.title_zh || "未命名論文";
     node.querySelector(".thesis-title-en").textContent = item.title_en || "";
     node.querySelector(".author").textContent = item.author_zh || item.author_en || "未載明";
-    node.querySelector(".advisor").textContent = item.advisor_zh || item.advisor_en || "未載明";
+    node.querySelector(".advisor").textContent = item.advisor_name || item.advisor_english || "未載明";
     node.querySelector(".secondary-theme").textContent = item.theme_secondary || "無";
     node.querySelector(".basis").textContent = item.theme_basis || "無";
     node.querySelector(".keywords").innerHTML = `<strong>關鍵字</strong> ${item.keywords_zh || "無"}`;
@@ -146,8 +307,14 @@ const renderResults = () => {
       420
     );
 
-    const link = node.querySelector(".detail-link");
-    link.href = item.url;
+    const detailLink = node.querySelector(".detail-link");
+    detailLink.href = item.url;
+
+    const inlineLink = node.querySelector(".detail-link-inline");
+    inlineLink.href = item.url;
+
+    const advisorPageLink = node.querySelector(".advisor-page-link");
+    advisorPageLink.href = `./advisors/${item.advisor_slug}.html`;
 
     elements.resultsList.appendChild(node);
   });
@@ -155,7 +322,7 @@ const renderResults = () => {
 
 const updateHeadlineStats = () => {
   const years = uniqueSorted(state.theses.map((item) => item.year)).sort();
-  const advisors = uniqueSorted(state.theses.map((item) => item.advisor_zh || "未載明"));
+  const advisors = uniqueSorted(state.theses.map((item) => item.advisor_slug));
   const themes = uniqueSorted(state.theses.map((item) => item.theme_primary));
 
   elements.statTotal.textContent = String(state.theses.length);
@@ -187,19 +354,45 @@ const bindEvents = () => {
   });
 };
 
+const applyInitialQuery = () => {
+  const params = new URLSearchParams(window.location.search);
+  const advisor = safeText(params.get("advisor"));
+  const theme = safeText(params.get("theme"));
+  const year = safeText(params.get("year"));
+  const q = safeText(params.get("q"));
+
+  if (advisor) {
+    elements.advisorFilter.value = advisor;
+  }
+  if (theme) {
+    elements.themeFilter.value = theme;
+  }
+  if (year) {
+    elements.yearFilter.value = year;
+  }
+  if (q) {
+    elements.searchInput.value = q;
+  }
+};
+
 const init = async () => {
   const response = await fetch(DATA_URL);
   if (!response.ok) {
     throw new Error(`資料載入失敗：${response.status}`);
   }
 
-  state.theses = await response.json();
+  state.theses = normalizeRecords(await response.json());
   state.filtered = [...state.theses];
 
   updateHeadlineStats();
   hydrateFilters();
   renderSummary();
+  renderCharts();
+  renderKeywords();
+  renderAdvisorDirectory();
   bindEvents();
+  applyInitialQuery();
+  applyFilters();
   renderResults();
 };
 
