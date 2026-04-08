@@ -259,6 +259,30 @@ button:hover {
   background: rgba(255, 255, 255, 0.82);
 }
 
+.chart-controls {
+  margin-top: 16px;
+}
+
+.compact-filter {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.compact-filter span {
+  font-weight: 700;
+  color: var(--deep);
+}
+
+.compact-filter select {
+  min-width: 180px;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.82);
+}
+
 .chart-stack {
   display: grid;
   gap: 22px;
@@ -305,6 +329,20 @@ button:hover {
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(90deg, #b26139, #174c4f);
+}
+
+.chart-row.is-active .chart-label,
+.chart-row.is-active .chart-value {
+  font-weight: 700;
+  color: var(--deep);
+}
+
+.chart-row.is-active .chart-track {
+  background: rgba(178, 97, 57, 0.16);
+}
+
+.chart-row.is-active .chart-bar {
+  background: linear-gradient(90deg, #d26f38, #174c4f);
 }
 
 .year-bars .chart-bar {

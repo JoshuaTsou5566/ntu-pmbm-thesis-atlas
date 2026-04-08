@@ -5,6 +5,7 @@ const state = {
   filtered: [],
   normalizedAdvisors: [],
   abstractLanguage: "zh",
+  dashboardYear: "",
 };
 
 const elements = {
@@ -18,6 +19,7 @@ const elements = {
   themeDonut: document.querySelector("#theme-donut"),
   themeDonutLegend: document.querySelector("#theme-donut-legend"),
   advisorChart: document.querySelector("#advisor-chart"),
+  dashboardYearFilter: document.querySelector("#dashboard-year-filter"),
   keywordVisualization: document.querySelector("#keyword-visualization"),
   advisorDirectory: document.querySelector("#advisor-directory"),
   themeFilter: document.querySelector("#theme-filter"),
@@ -108,6 +110,10 @@ const hydrateFilters = () => {
   advisorOptions.forEach((value) =>
     elements.advisorFilter.appendChild(createOption(value, value))
   );
+  elements.dashboardYearFilter.replaceChildren(createOption("全部年度", ""));
+  yearOptions.forEach((value) =>
+    elements.dashboardYearFilter.appendChild(createOption(value, value))
+  );
 };
 
 const renderSummary = () => {
@@ -134,13 +140,13 @@ const renderSummary = () => {
   });
 };
 
-const renderBarChart = (container, entries, colorClass = "") => {
+const renderBarChart = (container, entries, colorClass = "", activeLabel = "") => {
   container.replaceChildren();
   const max = Math.max(...entries.map(([, value]) => value), 1);
 
   entries.forEach(([label, value]) => {
     const row = document.createElement("div");
-    row.className = `chart-row ${colorClass}`.trim();
+    row.className = `chart-row ${colorClass} ${activeLabel && label === activeLabel ? "is-active" : ""}`.trim();
     row.innerHTML = `
       <div class="chart-label">${label}</div>
       <div class="chart-track">
@@ -217,8 +223,12 @@ const renderDonutChart = (container, legendNode, entries, totalLabel = "總論�
 };
 
 const renderCharts = () => {
+  const chartSource = state.dashboardYear
+    ? state.theses.filter((item) => item.year === state.dashboardYear)
+    : state.theses;
+
   const themeCounts = Object.entries(
-    state.theses.reduce((acc, item) => {
+    chartSource.reduce((acc, item) => {
       acc[item.theme_primary] = (acc[item.theme_primary] || 0) + 1;
       return acc;
     }, {})
@@ -232,7 +242,7 @@ const renderCharts = () => {
   ).sort((a, b) => Number(a[0]) - Number(b[0]));
 
   const advisorCounts = Object.entries(
-    state.theses.reduce((acc, item) => {
+    chartSource.reduce((acc, item) => {
       acc[item.advisor_name] = (acc[item.advisor_name] || 0) + 1;
       return acc;
     }, {})
@@ -241,18 +251,19 @@ const renderCharts = () => {
     .slice(0, 10);
 
   renderBarChart(elements.themeChart, themeCounts, "theme-bars");
-  renderBarChart(elements.yearChart, yearCounts, "year-bars");
+  renderBarChart(elements.yearChart, yearCounts, "year-bars", state.dashboardYear);
   renderBarChart(elements.advisorChart, advisorCounts, "advisor-bars");
   renderDonutChart(
     elements.themeDonut,
     elements.themeDonutLegend,
     themeCounts,
-    "篇論文"
+    state.dashboardYear ? `${state.dashboardYear} 年` : "篇論文"
   );
+  renderKeywords(chartSource);
 };
 
-const renderKeywords = () => {
-  const keywordCounts = state.theses.reduce((acc, item) => {
+const renderKeywords = (source = state.theses) => {
+  const keywordCounts = source.reduce((acc, item) => {
     safeText(item.keywords_zh)
       .split("；")
       .map((keyword) => keyword.trim())
@@ -418,6 +429,10 @@ const bindEvents = () => {
   [elements.themeFilter, elements.yearFilter, elements.advisorFilter].forEach((element) =>
     element.addEventListener("change", applyFilters)
   );
+  elements.dashboardYearFilter.addEventListener("change", () => {
+    state.dashboardYear = elements.dashboardYearFilter.value;
+    renderCharts();
+  });
   elements.searchInput.addEventListener("input", applyFilters);
   elements.clearFilters.addEventListener("click", () => {
     elements.searchInput.value = "";
@@ -452,6 +467,8 @@ const applyInitialQuery = () => {
   }
   if (year) {
     elements.yearFilter.value = year;
+    elements.dashboardYearFilter.value = year;
+    state.dashboardYear = year;
   }
   if (q) {
     elements.searchInput.value = q;
@@ -471,7 +488,6 @@ const init = async () => {
   hydrateFilters();
   renderSummary();
   renderCharts();
-  renderKeywords();
   renderAdvisorDirectory();
   bindEvents();
   applyInitialQuery();
