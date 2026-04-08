@@ -15,6 +15,9 @@ const elements = {
   themeSummary: document.querySelector("#theme-summary"),
   themeChart: document.querySelector("#theme-chart"),
   yearChart: document.querySelector("#year-chart"),
+  themeDonut: document.querySelector("#theme-donut"),
+  themeDonutLegend: document.querySelector("#theme-donut-legend"),
+  advisorChart: document.querySelector("#advisor-chart"),
   keywordVisualization: document.querySelector("#keyword-visualization"),
   advisorDirectory: document.querySelector("#advisor-directory"),
   themeFilter: document.querySelector("#theme-filter"),
@@ -149,6 +152,70 @@ const renderBarChart = (container, entries, colorClass = "") => {
   });
 };
 
+const renderDonutChart = (container, legendNode, entries, totalLabel = "總論文") => {
+  container.replaceChildren();
+  legendNode.replaceChildren();
+  const total = entries.reduce((sum, [, value]) => sum + value, 0) || 1;
+  const palette = [
+    "#174c4f",
+    "#b26139",
+    "#7fa38f",
+    "#db8d5a",
+    "#437975",
+    "#cc6f5b",
+    "#9ebea8",
+    "#8d5b4c",
+    "#5f7f96",
+  ];
+  const radius = 90;
+  const circumference = 2 * Math.PI * radius;
+  let offset = 0;
+
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 240 240");
+
+  const bgCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  bgCircle.setAttribute("cx", "120");
+  bgCircle.setAttribute("cy", "120");
+  bgCircle.setAttribute("r", String(radius));
+  bgCircle.setAttribute("fill", "none");
+  bgCircle.setAttribute("stroke", "rgba(23, 76, 79, 0.08)");
+  bgCircle.setAttribute("stroke-width", "26");
+  svg.appendChild(bgCircle);
+
+  entries.forEach(([label, value], index) => {
+    const color = palette[index % palette.length];
+    const length = (value / total) * circumference;
+    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circle.setAttribute("cx", "120");
+    circle.setAttribute("cy", "120");
+    circle.setAttribute("r", String(radius));
+    circle.setAttribute("fill", "none");
+    circle.setAttribute("stroke", color);
+    circle.setAttribute("stroke-width", "26");
+    circle.setAttribute("stroke-linecap", "butt");
+    circle.setAttribute("stroke-dasharray", `${length} ${circumference - length}`);
+    circle.setAttribute("stroke-dashoffset", String(-offset));
+    svg.appendChild(circle);
+    offset += length;
+
+    const row = document.createElement("div");
+    row.className = "legend-row";
+    row.innerHTML = `
+      <span class="legend-swatch" style="background:${color}"></span>
+      <span class="legend-label">${label}</span>
+      <span class="legend-value">${value} (${Math.round((value / total) * 100)}%)</span>
+    `;
+    legendNode.appendChild(row);
+  });
+
+  const hole = document.createElement("div");
+  hole.className = "donut-hole";
+  hole.innerHTML = `<div><strong>${total}</strong><span>${totalLabel}</span></div>`;
+  container.appendChild(svg);
+  container.appendChild(hole);
+};
+
 const renderCharts = () => {
   const themeCounts = Object.entries(
     state.theses.reduce((acc, item) => {
@@ -164,8 +231,24 @@ const renderCharts = () => {
     }, {})
   ).sort((a, b) => Number(a[0]) - Number(b[0]));
 
+  const advisorCounts = Object.entries(
+    state.theses.reduce((acc, item) => {
+      acc[item.advisor_name] = (acc[item.advisor_name] || 0) + 1;
+      return acc;
+    }, {})
+  )
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10);
+
   renderBarChart(elements.themeChart, themeCounts, "theme-bars");
   renderBarChart(elements.yearChart, yearCounts, "year-bars");
+  renderBarChart(elements.advisorChart, advisorCounts, "advisor-bars");
+  renderDonutChart(
+    elements.themeDonut,
+    elements.themeDonutLegend,
+    themeCounts,
+    "篇論文"
+  );
 };
 
 const renderKeywords = () => {

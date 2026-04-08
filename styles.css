@@ -185,6 +185,13 @@ button:hover {
   grid-template-columns: 1.25fr 0.95fr;
 }
 
+.comparison-grid {
+  margin-top: 26px;
+  display: grid;
+  grid-template-columns: 0.95fr 1.25fr;
+  gap: 16px;
+}
+
 .advisor-section {
   margin-top: 26px;
 }
@@ -309,6 +316,78 @@ button:hover {
   flex-wrap: wrap;
   gap: 12px;
   margin-top: 14px;
+}
+
+.donut-layout {
+  display: grid;
+  grid-template-columns: 230px 1fr;
+  gap: 18px;
+  align-items: center;
+  margin-top: 14px;
+}
+
+.donut-chart {
+  position: relative;
+  width: min(230px, 100%);
+  aspect-ratio: 1;
+  margin: 0 auto;
+}
+
+.donut-chart svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  overflow: visible;
+}
+
+.donut-hole {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 44%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  background: rgba(255, 252, 247, 0.95);
+  display: grid;
+  place-items: center;
+  text-align: center;
+  box-shadow: inset 0 0 0 1px rgba(31, 42, 43, 0.06);
+}
+
+.donut-hole strong {
+  display: block;
+  font-size: 1.35rem;
+  color: var(--deep);
+}
+
+.donut-hole span {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+
+.donut-legend {
+  display: grid;
+  gap: 10px;
+}
+
+.legend-row {
+  display: grid;
+  grid-template-columns: 14px 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.legend-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+}
+
+.legend-label,
+.legend-value {
+  font-size: 0.94rem;
 }
 
 .keyword-chip {
@@ -541,6 +620,7 @@ button:hover {
   .hero,
   .summary-grid,
   .dashboard-grid,
+  .comparison-grid,
   .advisor-dashboard,
   .advisor-page .hero {
     grid-template-columns: 1fr;
@@ -550,6 +630,10 @@ button:hover {
   .filters,
   .meta-grid,
   .advisor-directory {
+    grid-template-columns: 1fr;
+  }
+
+  .donut-layout {
     grid-template-columns: 1fr;
   }
 }
