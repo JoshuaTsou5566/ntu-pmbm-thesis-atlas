@@ -10,7 +10,12 @@
     <div class="page-shell">
       <nav class="site-nav">
         <a class="site-brand" href="./index.html">NTU Thesis Atlas</a>
-        <div class="site-nav-links">
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav-links">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <div class="site-nav-links" id="site-nav-links">
           <a class="is-active" href="./index.html">首頁</a>
           <a href="./heatmaps.html">熱圖分析</a>
           <a href="./advisors/">指導教授總覽</a>
@@ -19,7 +24,7 @@
       <div class="breadcrumb">
         <a href="./index.html">首頁</a>
         <span>/</span>
-        <strong>論文總覽</strong>
+        <strong>[總覽] 論文探索與比較</strong>
       </div>
       <header class="hero">
         <div class="hero-copy">
@@ -195,6 +200,11 @@
           <div id="results-list" class="results-list"></div>
         </section>
       </main>
+
+      <footer class="site-footer">
+        <p>資料來源：NTU Theses and Dissertations Repository。</p>
+        <p>網站更新日期：2026-04-09</p>
+      </footer>
     </div>
 
     <template id="thesis-card-template">
@@ -228,6 +238,7 @@
       </article>
     </template>
 
+    <script src="./nav.js" type="module"></script>
     <script src="./app.js" type="module"></script>
   </body>
 </html>

@@ -10,7 +10,12 @@
     <div class="page-shell">
       <nav class="site-nav">
         <a class="site-brand" href="../index.html">NTU Thesis Atlas</a>
-        <div class="site-nav-links">
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav-links">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <div class="site-nav-links" id="site-nav-links">
           <a href="../index.html">首頁</a>
           <a href="../heatmaps.html">熱圖分析</a>
           <a href="./">指導教授總覽</a>
@@ -21,7 +26,7 @@
         <span>/</span>
         <a href="./">指導教授總覽</a>
         <span>/</span>
-        <strong id="advisor-breadcrumb">指導教授頁</strong>
+        <strong id="advisor-breadcrumb">[教師] 指導教授頁</strong>
       </div>
       <header class="hero">
         <div class="hero-copy">
@@ -91,7 +96,13 @@
           <div id="advisor-thesis-list" class="results-list"></div>
         </section>
       </main>
+
+      <footer class="site-footer">
+        <p>資料來源：NTU Theses and Dissertations Repository。</p>
+        <p>網站更新日期：2026-04-09</p>
+      </footer>
     </div>
+    <script src="../nav.js" type="module"></script>
     <script>window.__ADVISOR_SLUG__ = "余峻瑜";</script>
     <script src="../advisor.js" type="module"></script>
   </body>
