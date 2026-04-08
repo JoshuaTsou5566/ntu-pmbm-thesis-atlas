@@ -85,6 +85,23 @@ const createOption = (label, value = "") => {
   return option;
 };
 
+const setFilters = ({ theme, year, advisor, query } = {}) => {
+  if (theme !== undefined) {
+    elements.themeFilter.value = theme;
+  }
+  if (year !== undefined) {
+    elements.yearFilter.value = year;
+    elements.dashboardYearFilter.value = year;
+    state.dashboardYear = year;
+  }
+  if (advisor !== undefined) {
+    elements.advisorFilter.value = advisor;
+  }
+  if (query !== undefined) {
+    elements.searchInput.value = query;
+  }
+};
+
 const normalizeRecords = (rows) =>
   rows.map((item) => {
     const advisor = extractAdvisor(item);
@@ -128,7 +145,7 @@ const renderSummary = () => {
 
   rows.forEach(([theme, count]) => {
     const div = document.createElement("div");
-    div.className = "theme-row";
+    div.className = "theme-row is-clickable";
     div.innerHTML = `
       <div>
         <strong>${theme}</strong>
@@ -136,17 +153,28 @@ const renderSummary = () => {
       </div>
       <strong>${count} 篇</strong>
     `;
+    div.addEventListener("click", () => {
+      setFilters({ theme, year: state.dashboardYear || "" });
+      applyFilters();
+      document.querySelector("#results").scrollIntoView({ behavior: "smooth" });
+    });
     elements.themeSummary.appendChild(div);
   });
 };
 
-const renderBarChart = (container, entries, colorClass = "", activeLabel = "") => {
+const renderBarChart = (
+  container,
+  entries,
+  colorClass = "",
+  activeLabel = "",
+  onClick = null
+) => {
   container.replaceChildren();
   const max = Math.max(...entries.map(([, value]) => value), 1);
 
   entries.forEach(([label, value]) => {
     const row = document.createElement("div");
-    row.className = `chart-row ${colorClass} ${activeLabel && label === activeLabel ? "is-active" : ""}`.trim();
+    row.className = `chart-row ${colorClass} ${activeLabel && label === activeLabel ? "is-active" : ""} ${onClick ? "is-clickable" : ""}`.trim();
     row.innerHTML = `
       <div class="chart-label">${label}</div>
       <div class="chart-track">
@@ -154,11 +182,20 @@ const renderBarChart = (container, entries, colorClass = "", activeLabel = "") =
       </div>
       <div class="chart-value">${value}</div>
     `;
+    if (onClick) {
+      row.addEventListener("click", () => onClick(label, value));
+    }
     container.appendChild(row);
   });
 };
 
-const renderDonutChart = (container, legendNode, entries, totalLabel = "總論文") => {
+const renderDonutChart = (
+  container,
+  legendNode,
+  entries,
+  totalLabel = "總論文",
+  onClick = null
+) => {
   container.replaceChildren();
   legendNode.replaceChildren();
   const total = entries.reduce((sum, [, value]) => sum + value, 0) || 1;
@@ -206,12 +243,15 @@ const renderDonutChart = (container, legendNode, entries, totalLabel = "總論�
     offset += length;
 
     const row = document.createElement("div");
-    row.className = "legend-row";
+    row.className = `legend-row ${onClick ? "is-clickable" : ""}`;
     row.innerHTML = `
       <span class="legend-swatch" style="background:${color}"></span>
       <span class="legend-label">${label}</span>
       <span class="legend-value">${value} (${Math.round((value / total) * 100)}%)</span>
     `;
+    if (onClick) {
+      row.addEventListener("click", () => onClick(label, value));
+    }
     legendNode.appendChild(row);
   });
 
@@ -250,14 +290,31 @@ const renderCharts = () => {
     .sort((a, b) => b[1] - a[1])
     .slice(0, 10);
 
-  renderBarChart(elements.themeChart, themeCounts, "theme-bars");
-  renderBarChart(elements.yearChart, yearCounts, "year-bars", state.dashboardYear);
-  renderBarChart(elements.advisorChart, advisorCounts, "advisor-bars");
+  renderBarChart(elements.themeChart, themeCounts, "theme-bars", "", (label) => {
+    setFilters({ theme: label, year: state.dashboardYear || "" });
+    applyFilters();
+    document.querySelector("#results").scrollIntoView({ behavior: "smooth" });
+  });
+  renderBarChart(elements.yearChart, yearCounts, "year-bars", state.dashboardYear, (label) => {
+    setFilters({ year: label });
+    applyFilters();
+    document.querySelector("#results").scrollIntoView({ behavior: "smooth" });
+  });
+  renderBarChart(elements.advisorChart, advisorCounts, "advisor-bars", "", (label) => {
+    setFilters({ advisor: label, year: state.dashboardYear || "" });
+    applyFilters();
+    document.querySelector("#results").scrollIntoView({ behavior: "smooth" });
+  });
   renderDonutChart(
     elements.themeDonut,
     elements.themeDonutLegend,
     themeCounts,
-    state.dashboardYear ? `${state.dashboardYear} 年` : "篇論文"
+    state.dashboardYear ? `${state.dashboardYear} 年` : "篇論文",
+    (label) => {
+      setFilters({ theme: label, year: state.dashboardYear || "" });
+      applyFilters();
+      document.querySelector("#results").scrollIntoView({ behavior: "smooth" });
+    }
   );
   renderKeywords(chartSource);
 };
@@ -288,7 +345,7 @@ const renderKeywords = (source = state.theses) => {
     chip.style.setProperty("--keyword-scale", String(count / max));
     chip.innerHTML = `<strong>${keyword}</strong><span>${count}</span>`;
     chip.addEventListener("click", () => {
-      elements.searchInput.value = keyword;
+      setFilters({ query: keyword, year: state.dashboardYear || "" });
       applyFilters();
       document.querySelector("#results").scrollIntoView({ behavior: "smooth" });
     });
@@ -443,10 +500,7 @@ const bindEvents = () => {
   });
   elements.searchInput.addEventListener("input", applyFilters);
   elements.clearFilters.addEventListener("click", () => {
-    elements.searchInput.value = "";
-    elements.themeFilter.value = "";
-    elements.yearFilter.value = "";
-    elements.advisorFilter.value = "";
+    setFilters({ query: "", theme: "", year: "", advisor: "" });
     applyFilters();
   });
   elements.jumpToResults.addEventListener("click", () =>
