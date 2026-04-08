@@ -459,6 +459,9 @@ const renderKeywords = (source = state.theses) => {
 };
 
 const renderHeatmaps = () => {
+  if (!elements.themeYearHeatmap || !elements.advisorThemeHeatmap) {
+    return;
+  }
   const allYears = uniqueSorted(state.theses.map((item) => item.year)).sort();
   const themeRows = uniqueSorted(state.theses.map((item) => item.theme_primary));
   const advisorRows = Object.entries(
@@ -530,6 +533,9 @@ const renderHeatmaps = () => {
 };
 
 const renderAdvisorDirectory = () => {
+  if (!elements.advisorDirectory) {
+    return;
+  }
   const grouped = state.theses.reduce((acc, item) => {
     if (!acc[item.advisor_slug]) {
       acc[item.advisor_slug] = {
@@ -731,7 +737,6 @@ const init = async () => {
   bindEvents();
   applyInitialQuery();
   applyFilters();
-  renderResults();
 };
 
 init().catch((error) => {

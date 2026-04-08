@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>指導教授總覽｜NTU 生技管理論文地圖</title>
+    <link rel="stylesheet" href="../styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Advisor Hub</p>
+          <h1>指導教授總覽</h1>
+          <p class="intro">
+            把老師入口集中到這一頁，方便先看整體排行，再進入每位指導教授的專屬分析頁。
+          </p>
+          <div class="hero-actions">
+            <a class="primary-button" href="../index.html">回首頁</a>
+            <a class="ghost-button" href="../heatmaps.html">看熱圖分析</a>
+          </div>
+        </div>
+        <div class="hero-panel">
+          <div class="stat-card">
+            <span class="stat-label">指導教授</span>
+            <strong id="stat-advisors">-</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">論文總數</span>
+            <strong id="stat-total">-</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">主題群組</span>
+            <strong id="stat-themes">-</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">年份範圍</span>
+            <strong id="stat-years">-</strong>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <section class="comparison-grid">
+          <article class="panel">
+            <div class="panel-heading">
+              <h2>指導教授排行</h2>
+              <p>看哪幾位老師帶的論文最多。</p>
+            </div>
+            <div id="advisor-chart" class="bar-chart advisor-chart"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-heading">
+              <h2>主題分布圓餅圖</h2>
+              <p>快速理解整個學程目前的研究主題重心。</p>
+            </div>
+            <div class="donut-layout">
+              <div id="theme-donut" class="donut-chart" aria-label="主題分布圖"></div>
+              <div id="theme-donut-legend" class="donut-legend"></div>
+            </div>
+          </article>
+        </section>
+
+        <section class="advisor-section">
+          <article class="panel">
+            <div class="panel-heading">
+              <h2>全部指導教授</h2>
+              <p>點卡片直接進入老師專屬頁面。</p>
+            </div>
+            <div id="advisor-directory" class="advisor-directory"></div>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <script src="../advisors-index.js" type="module"></script>
+  </body>
+</html>

@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>熱圖分析｜NTU 生技管理論文地圖</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Heatmap View</p>
+          <h1>熱圖分析</h1>
+          <p class="intro">
+            把跨維度比較拆成專門頁面，讓你更專心看主題、年份、指導教授之間的交叉關係。
+          </p>
+          <div class="hero-actions">
+            <a class="primary-button" href="./index.html">回首頁</a>
+            <a class="ghost-button" href="./advisors/">看指導教授總覽</a>
+          </div>
+        </div>
+        <div class="hero-panel">
+          <div class="stat-card">
+            <span class="stat-label">論文總數</span>
+            <strong id="stat-total">-</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">主題群組</span>
+            <strong id="stat-themes">-</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">指導教授</span>
+            <strong id="stat-advisors">-</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">年份範圍</span>
+            <strong id="stat-years">-</strong>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <section class="filter-state-section">
+          <article class="panel">
+            <div class="panel-heading">
+              <h2>目前篩選條件</h2>
+              <p>熱圖與下方論文列表會同步。</p>
+            </div>
+            <div id="active-filters" class="active-filters"></div>
+          </article>
+        </section>
+
+        <section class="comparison-grid">
+          <article class="panel">
+            <div class="panel-heading">
+              <h2>主題 × 年份熱圖</h2>
+              <p>看不同主題在各年度的分布密度。</p>
+            </div>
+            <div id="theme-year-heatmap" class="heatmap"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-heading">
+              <h2>指導教授 × 主題熱圖</h2>
+              <p>看主要指導教授的研究主題側重。</p>
+            </div>
+            <div id="advisor-theme-heatmap" class="heatmap"></div>
+          </article>
+        </section>
+
+        <section class="summary-grid">
+          <article class="panel">
+            <div class="panel-heading">
+              <h2>快速篩選</h2>
+              <p>熱圖之外，仍可直接用條件搜尋結果。</p>
+            </div>
+            <div class="filters">
+              <label>
+                <span>搜尋</span>
+                <input id="search-input" type="search" placeholder="輸入題名、關鍵字、摘要、作者" />
+              </label>
+              <label>
+                <span>主題</span>
+                <select id="theme-filter"></select>
+              </label>
+              <label>
+                <span>年份</span>
+                <select id="year-filter"></select>
+              </label>
+              <label>
+                <span>指導教授</span>
+                <select id="advisor-filter"></select>
+              </label>
+            </div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-heading">
+              <h2>熱門關鍵字</h2>
+              <p>從熱圖跳到具體研究詞彙。</p>
+            </div>
+            <div id="keyword-visualization" class="keyword-visualization"></div>
+          </article>
+        </section>
+
+        <section id="results" class="results-section">
+          <div class="results-header">
+            <div>
+              <h2>論文列表</h2>
+              <p id="result-count">載入中...</p>
+            </div>
+            <button id="clear-filters" class="ghost-button small">清除篩選</button>
+          </div>
+          <div id="results-list" class="results-list"></div>
+        </section>
+      </main>
+    </div>
+
+    <template id="thesis-card-template">
+      <article class="thesis-card">
+        <div class="card-topline">
+          <span class="year-chip"></span>
+          <span class="theme-chip"></span>
+        </div>
+        <div class="mobile-card-top">
+          <div class="mobile-card-copy">
+            <h3 class="thesis-title"></h3>
+            <p class="thesis-title-en"></p>
+          </div>
+          <a class="detail-link detail-link-inline" target="_blank" rel="noreferrer">原始頁面</a>
+        </div>
+        <div class="meta-grid">
+          <p><strong>作者</strong><span class="author"></span></p>
+          <p><strong>指導教授</strong><span class="advisor"></span></p>
+          <p><strong>次主題</strong><span class="secondary-theme"></span></p>
+          <p><strong>分類依據</strong><span class="basis"></span></p>
+        </div>
+        <p class="keywords"></p>
+        <div class="abstract-block">
+          <h4 class="abstract-heading">摘要</h4>
+          <p class="abstract"></p>
+        </div>
+        <div class="card-footer">
+          <a class="advisor-page-link" target="_self">查看指導教授頁</a>
+          <a class="detail-link" target="_blank" rel="noreferrer">開啟論文頁面</a>
+        </div>
+      </article>
+    </template>
+
+    <script src="./heatmaps.js" type="module"></script>
+  </body>
+</html>
