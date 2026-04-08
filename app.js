@@ -20,6 +20,8 @@ const elements = {
   themeDonutLegend: document.querySelector("#theme-donut-legend"),
   advisorChart: document.querySelector("#advisor-chart"),
   dashboardYearFilter: document.querySelector("#dashboard-year-filter"),
+  themeYearHeatmap: document.querySelector("#theme-year-heatmap"),
+  advisorThemeHeatmap: document.querySelector("#advisor-theme-heatmap"),
   keywordVisualization: document.querySelector("#keyword-visualization"),
   advisorDirectory: document.querySelector("#advisor-directory"),
   themeFilter: document.querySelector("#theme-filter"),
@@ -102,6 +104,8 @@ const setFilters = ({ theme, year, advisor, query } = {}) => {
   }
 };
 
+const toggleFilterValue = (current, next) => (current === next ? "" : next);
+
 const normalizeRecords = (rows) =>
   rows.map((item) => {
     const advisor = extractAdvisor(item);
@@ -145,7 +149,7 @@ const renderSummary = () => {
 
   rows.forEach(([theme, count]) => {
     const div = document.createElement("div");
-    div.className = "theme-row is-clickable";
+    div.className = `theme-row is-clickable ${elements.themeFilter.value === theme ? "is-selected" : ""}`;
     div.innerHTML = `
       <div>
         <strong>${theme}</strong>
@@ -154,7 +158,10 @@ const renderSummary = () => {
       <strong>${count} 篇</strong>
     `;
     div.addEventListener("click", () => {
-      setFilters({ theme, year: state.dashboardYear || "" });
+      setFilters({
+        theme: toggleFilterValue(elements.themeFilter.value, theme),
+        year: state.dashboardYear || "",
+      });
       applyFilters();
       document.querySelector("#results").scrollIntoView({ behavior: "smooth" });
     });
@@ -167,14 +174,15 @@ const renderBarChart = (
   entries,
   colorClass = "",
   activeLabel = "",
-  onClick = null
+  onClick = null,
+  selectedLabel = ""
 ) => {
   container.replaceChildren();
   const max = Math.max(...entries.map(([, value]) => value), 1);
 
   entries.forEach(([label, value]) => {
     const row = document.createElement("div");
-    row.className = `chart-row ${colorClass} ${activeLabel && label === activeLabel ? "is-active" : ""} ${onClick ? "is-clickable" : ""}`.trim();
+    row.className = `chart-row ${colorClass} ${activeLabel && label === activeLabel ? "is-active" : ""} ${selectedLabel && label === selectedLabel ? "is-selected" : ""} ${onClick ? "is-clickable" : ""}`.trim();
     row.innerHTML = `
       <div class="chart-label">${label}</div>
       <div class="chart-track">
@@ -194,7 +202,8 @@ const renderDonutChart = (
   legendNode,
   entries,
   totalLabel = "總論文",
-  onClick = null
+  onClick = null,
+  selectedLabel = ""
 ) => {
   container.replaceChildren();
   legendNode.replaceChildren();
@@ -243,7 +252,7 @@ const renderDonutChart = (
     offset += length;
 
     const row = document.createElement("div");
-    row.className = `legend-row ${onClick ? "is-clickable" : ""}`;
+    row.className = `legend-row ${onClick ? "is-clickable" : ""} ${selectedLabel && selectedLabel === label ? "is-selected" : ""}`;
     row.innerHTML = `
       <span class="legend-swatch" style="background:${color}"></span>
       <span class="legend-label">${label}</span>
@@ -260,6 +269,45 @@ const renderDonutChart = (
   hole.innerHTML = `<div><strong>${total}</strong><span>${totalLabel}</span></div>`;
   container.appendChild(svg);
   container.appendChild(hole);
+};
+
+const renderHeatmap = (container, columns, rows, getValue, onCellClick, isSelected) => {
+  container.replaceChildren();
+  const values = [];
+  rows.forEach((row) => columns.forEach((col) => values.push(getValue(row, col))));
+  const max = Math.max(...values, 1);
+
+  const header = document.createElement("div");
+  header.className = "heatmap-header";
+  header.appendChild(Object.assign(document.createElement("div"), { className: "heatmap-corner" }));
+  columns.forEach((col) => {
+    const div = document.createElement("div");
+    div.className = "heatmap-col";
+    div.textContent = col;
+    header.appendChild(div);
+  });
+  container.appendChild(header);
+
+  rows.forEach((row) => {
+    const rowEl = document.createElement("div");
+    rowEl.className = "heatmap-row";
+    const label = document.createElement("div");
+    label.className = "heatmap-label";
+    label.textContent = row;
+    rowEl.appendChild(label);
+    columns.forEach((col) => {
+      const value = getValue(row, col);
+      const cell = document.createElement("button");
+      cell.type = "button";
+      cell.className = `heatmap-cell ${isSelected(row, col) ? "is-selected" : ""}`;
+      cell.style.background = `rgba(23, 76, 79, ${0.08 + (value / max) * 0.72})`;
+      cell.style.color = value / max > 0.52 ? "#fffaf3" : "var(--deep)";
+      cell.textContent = value ? String(value) : "-";
+      cell.addEventListener("click", () => onCellClick(row, col));
+      rowEl.appendChild(cell);
+    });
+    container.appendChild(rowEl);
+  });
 };
 
 const renderCharts = () => {
@@ -291,32 +339,43 @@ const renderCharts = () => {
     .slice(0, 10);
 
   renderBarChart(elements.themeChart, themeCounts, "theme-bars", "", (label) => {
-    setFilters({ theme: label, year: state.dashboardYear || "" });
+    setFilters({
+      theme: toggleFilterValue(elements.themeFilter.value, label),
+      year: state.dashboardYear || "",
+    });
     applyFilters();
     document.querySelector("#results").scrollIntoView({ behavior: "smooth" });
-  });
+  }, elements.themeFilter.value);
   renderBarChart(elements.yearChart, yearCounts, "year-bars", state.dashboardYear, (label) => {
-    setFilters({ year: label });
+    setFilters({ year: toggleFilterValue(elements.yearFilter.value, label) });
     applyFilters();
     document.querySelector("#results").scrollIntoView({ behavior: "smooth" });
-  });
+  }, elements.yearFilter.value);
   renderBarChart(elements.advisorChart, advisorCounts, "advisor-bars", "", (label) => {
-    setFilters({ advisor: label, year: state.dashboardYear || "" });
+    setFilters({
+      advisor: toggleFilterValue(elements.advisorFilter.value, label),
+      year: state.dashboardYear || "",
+    });
     applyFilters();
     document.querySelector("#results").scrollIntoView({ behavior: "smooth" });
-  });
+  }, elements.advisorFilter.value);
   renderDonutChart(
     elements.themeDonut,
     elements.themeDonutLegend,
     themeCounts,
     state.dashboardYear ? `${state.dashboardYear} 年` : "篇論文",
     (label) => {
-      setFilters({ theme: label, year: state.dashboardYear || "" });
+      setFilters({
+        theme: toggleFilterValue(elements.themeFilter.value, label),
+        year: state.dashboardYear || "",
+      });
       applyFilters();
       document.querySelector("#results").scrollIntoView({ behavior: "smooth" });
-    }
+    },
+    elements.themeFilter.value
   );
   renderKeywords(chartSource);
+  renderHeatmaps();
 };
 
 const renderKeywords = (source = state.theses) => {
@@ -341,16 +400,72 @@ const renderKeywords = (source = state.theses) => {
   entries.forEach(([keyword, count]) => {
     const chip = document.createElement("button");
     chip.type = "button";
-    chip.className = "keyword-chip";
+    chip.className = `keyword-chip ${elements.searchInput.value === keyword ? "is-selected" : ""}`;
     chip.style.setProperty("--keyword-scale", String(count / max));
     chip.innerHTML = `<strong>${keyword}</strong><span>${count}</span>`;
     chip.addEventListener("click", () => {
-      setFilters({ query: keyword, year: state.dashboardYear || "" });
+      setFilters({
+        query: toggleFilterValue(elements.searchInput.value, keyword),
+        year: state.dashboardYear || "",
+      });
       applyFilters();
       document.querySelector("#results").scrollIntoView({ behavior: "smooth" });
     });
     elements.keywordVisualization.appendChild(chip);
   });
+};
+
+const renderHeatmaps = () => {
+  const allYears = uniqueSorted(state.theses.map((item) => item.year)).sort();
+  const themeRows = uniqueSorted(state.theses.map((item) => item.theme_primary));
+  const advisorRows = Object.entries(
+    state.theses.reduce((acc, item) => {
+      acc[item.advisor_name] = (acc[item.advisor_name] || 0) + 1;
+      return acc;
+    }, {})
+  )
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10)
+    .map(([name]) => name);
+
+  renderHeatmap(
+    elements.themeYearHeatmap,
+    allYears,
+    themeRows,
+    (theme, year) =>
+      state.theses.filter((item) => item.theme_primary === theme && item.year === year).length,
+    (theme, year) => {
+      setFilters({
+        theme: toggleFilterValue(elements.themeFilter.value, theme),
+        year: toggleFilterValue(elements.yearFilter.value, year),
+      });
+      applyFilters();
+      document.querySelector("#results").scrollIntoView({ behavior: "smooth" });
+    },
+    (theme, year) => elements.themeFilter.value === theme && elements.yearFilter.value === year
+  );
+
+  const themesForAdvisor = themeRows;
+  renderHeatmap(
+    elements.advisorThemeHeatmap,
+    themesForAdvisor,
+    advisorRows,
+    (advisor, theme) =>
+      state.theses.filter(
+        (item) => item.advisor_name === advisor && item.theme_primary === theme
+      ).length,
+    (advisor, theme) => {
+      setFilters({
+        advisor: toggleFilterValue(elements.advisorFilter.value, advisor),
+        theme: toggleFilterValue(elements.themeFilter.value, theme),
+        year: state.dashboardYear || "",
+      });
+      applyFilters();
+      document.querySelector("#results").scrollIntoView({ behavior: "smooth" });
+    },
+    (advisor, theme) =>
+      elements.advisorFilter.value === advisor && elements.themeFilter.value === theme
+  );
 };
 
 const renderAdvisorDirectory = () => {

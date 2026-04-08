@@ -241,6 +241,14 @@ button:hover {
   transform: translateY(-1px);
 }
 
+.theme-row.is-selected,
+.chart-row.is-selected,
+.legend-row.is-selected,
+.keyword-chip.is-selected {
+  background: rgba(178, 97, 57, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(178, 97, 57, 0.26);
+}
+
 .theme-row strong {
   display: block;
   margin-bottom: 4px;
@@ -477,6 +485,57 @@ button:hover {
   font-size: 0.92rem;
 }
 
+.heatmap {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.heatmap-header,
+.heatmap-row {
+  display: grid;
+  grid-template-columns: 140px repeat(auto-fit, minmax(44px, 1fr));
+  gap: 8px;
+  align-items: center;
+}
+
+.heatmap-corner,
+.heatmap-col,
+.heatmap-label {
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+
+.heatmap-col {
+  text-align: center;
+}
+
+.heatmap-label {
+  line-height: 1.35;
+}
+
+.heatmap-cell {
+  min-height: 44px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--deep);
+  background: rgba(23, 76, 79, 0.06);
+  border: 1px solid rgba(23, 76, 79, 0.08);
+  cursor: pointer;
+  transition: transform 180ms ease, background-color 180ms ease;
+}
+
+.heatmap-cell:hover {
+  transform: translateY(-1px);
+}
+
+.heatmap-cell.is-selected {
+  outline: 2px solid rgba(178, 97, 57, 0.5);
+}
+
 .advisor-directory {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -694,6 +753,12 @@ button:hover {
 
   .donut-layout {
     grid-template-columns: 1fr;
+  }
+
+  .heatmap-header,
+  .heatmap-row {
+    grid-template-columns: 112px repeat(auto-fit, minmax(40px, 1fr));
+    gap: 6px;
   }
 }
 
