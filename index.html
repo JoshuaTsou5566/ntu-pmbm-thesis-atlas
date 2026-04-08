@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NTU 生技管理論文主題地圖</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">NTU Thesis Atlas</p>
+          <h1>生物科技管理碩士在職學位學程<br />論文主題地圖</h1>
+          <p class="intro">
+            把 152 篇論文整理成可以直接瀏覽、搜尋、篩選的靜態網站。
+            你可以依主題、年份、指導教授查看題目、關鍵字與中英文摘要。
+          </p>
+          <div class="hero-actions">
+            <button id="jump-to-results" class="primary-button">查看論文</button>
+            <button id="toggle-abstract-language" class="ghost-button">摘要顯示：中文</button>
+          </div>
+        </div>
+        <div class="hero-panel">
+          <div class="stat-card">
+            <span class="stat-label">論文總數</span>
+            <strong id="stat-total">-</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">主題群組</span>
+            <strong id="stat-themes">-</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">指導教授</span>
+            <strong id="stat-advisors">-</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">年份範圍</span>
+            <strong id="stat-years">-</strong>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <section class="summary-grid">
+          <article class="panel">
+            <div class="panel-heading">
+              <h2>主題分布</h2>
+              <p>依題名、關鍵字與摘要做規則式自動分群。</p>
+            </div>
+            <div id="theme-summary" class="theme-summary"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-heading">
+              <h2>快速篩選</h2>
+              <p>先縮小範圍，再看摘要會快很多。</p>
+            </div>
+            <div class="filters">
+              <label>
+                <span>搜尋</span>
+                <input id="search-input" type="search" placeholder="輸入題名、關鍵字、摘要、作者" />
+              </label>
+              <label>
+                <span>主題</span>
+                <select id="theme-filter"></select>
+              </label>
+              <label>
+                <span>年份</span>
+                <select id="year-filter"></select>
+              </label>
+              <label>
+                <span>指導教授</span>
+                <select id="advisor-filter"></select>
+              </label>
+            </div>
+          </article>
+        </section>
+
+        <section id="results" class="results-section">
+          <div class="results-header">
+            <div>
+              <h2>論文列表</h2>
+              <p id="result-count">載入中...</p>
+            </div>
+            <button id="clear-filters" class="ghost-button small">清除篩選</button>
+          </div>
+          <div id="results-list" class="results-list"></div>
+        </section>
+      </main>
+    </div>
+
+    <template id="thesis-card-template">
+      <article class="thesis-card">
+        <div class="card-topline">
+          <span class="year-chip"></span>
+          <span class="theme-chip"></span>
+        </div>
+        <h3 class="thesis-title"></h3>
+        <p class="thesis-title-en"></p>
+        <div class="meta-grid">
+          <p><strong>作者</strong><span class="author"></span></p>
+          <p><strong>指導教授</strong><span class="advisor"></span></p>
+          <p><strong>次主題</strong><span class="secondary-theme"></span></p>
+          <p><strong>分類依據</strong><span class="basis"></span></p>
+        </div>
+        <p class="keywords"></p>
+        <div class="abstract-block">
+          <h4 class="abstract-heading">摘要</h4>
+          <p class="abstract"></p>
+        </div>
+        <a class="detail-link" target="_blank" rel="noreferrer">開啟論文頁面</a>
+      </article>
+    </template>
+
+    <script src="./app.js" type="module"></script>
+  </body>
+</html>

@@ -1,0 +1,380 @@
+:root {
+  --bg: #f4efe7;
+  --bg-accent: #efe4d2;
+  --paper: rgba(255, 252, 247, 0.86);
+  --ink: #1f2a2b;
+  --muted: #5d6b69;
+  --line: rgba(31, 42, 43, 0.12);
+  --deep: #174c4f;
+  --warm: #b26139;
+  --warm-soft: #d7b08e;
+  --highlight: #d9ece4;
+  --shadow: 0 18px 48px rgba(58, 41, 26, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(210, 183, 152, 0.28), transparent 30%),
+    radial-gradient(circle at top right, rgba(23, 76, 79, 0.12), transparent 22%),
+    linear-gradient(180deg, #f8f3ec 0%, var(--bg) 45%, #f1ebdf 100%);
+}
+
+.page-shell {
+  width: min(1180px, calc(100vw - 32px));
+  margin: 0 auto;
+  padding: 24px 0 56px;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.9fr);
+  gap: 24px;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background:
+    linear-gradient(140deg, rgba(255, 252, 247, 0.95), rgba(239, 228, 210, 0.82)),
+    repeating-linear-gradient(
+      135deg,
+      transparent 0,
+      transparent 20px,
+      rgba(23, 76, 79, 0.03) 20px,
+      rgba(23, 76, 79, 0.03) 40px
+    );
+  box-shadow: var(--shadow);
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: var(--warm);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, serif;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(2.2rem, 5vw, 4rem);
+  line-height: 0.98;
+}
+
+.intro {
+  max-width: 60ch;
+  margin: 18px 0 0;
+  font-size: 1.04rem;
+  line-height: 1.75;
+  color: var(--muted);
+}
+
+.hero-actions,
+.results-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.hero-actions {
+  margin-top: 22px;
+}
+
+button,
+select,
+input {
+  font: inherit;
+}
+
+.primary-button,
+.ghost-button {
+  border-radius: 999px;
+  padding: 12px 18px;
+  cursor: pointer;
+  transition: transform 180ms ease, background-color 180ms ease, border-color 180ms ease;
+}
+
+.primary-button {
+  border: none;
+  background: var(--deep);
+  color: white;
+}
+
+.ghost-button {
+  border: 1px solid rgba(23, 76, 79, 0.18);
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--deep);
+}
+
+.small {
+  padding: 10px 14px;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+.hero-panel,
+.summary-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.hero-panel {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.stat-card,
+.panel,
+.thesis-card {
+  border: 1px solid var(--line);
+  background: var(--paper);
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow);
+}
+
+.stat-card {
+  min-height: 132px;
+  padding: 18px;
+  border-radius: 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.stat-card strong {
+  font-size: clamp(1.8rem, 3.6vw, 2.8rem);
+  color: var(--deep);
+}
+
+.stat-label,
+.panel-heading p,
+.results-header p,
+.thesis-title-en,
+.meta-grid p,
+.keywords,
+.detail-link {
+  color: var(--muted);
+}
+
+.summary-grid {
+  margin-top: 26px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.panel {
+  border-radius: 24px;
+  padding: 22px;
+}
+
+.panel-heading h2,
+.results-header h2 {
+  margin: 0;
+  font-size: 1.55rem;
+}
+
+.panel-heading p,
+.results-header p {
+  margin: 8px 0 0;
+  line-height: 1.65;
+}
+
+.theme-summary {
+  display: grid;
+  gap: 12px;
+}
+
+.theme-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(217, 236, 228, 0.5);
+}
+
+.theme-row strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filters span {
+  font-weight: 700;
+  color: var(--deep);
+}
+
+.filters input,
+.filters select {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.results-section {
+  margin-top: 26px;
+}
+
+.results-list {
+  display: grid;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.thesis-card {
+  border-radius: 24px;
+  padding: 22px;
+}
+
+.card-topline {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.year-chip,
+.theme-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.year-chip {
+  background: rgba(23, 76, 79, 0.12);
+  color: var(--deep);
+}
+
+.theme-chip {
+  background: rgba(178, 97, 57, 0.14);
+  color: var(--warm);
+}
+
+.thesis-title {
+  margin: 16px 0 8px;
+  font-size: 1.45rem;
+  line-height: 1.3;
+}
+
+.thesis-title-en {
+  margin: 0 0 16px;
+  line-height: 1.65;
+}
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 16px;
+}
+
+.meta-grid p {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  line-height: 1.55;
+}
+
+.meta-grid strong {
+  color: var(--ink);
+}
+
+.keywords,
+.abstract {
+  line-height: 1.8;
+}
+
+.keywords {
+  margin: 18px 0 0;
+}
+
+.abstract-block {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px dashed rgba(31, 42, 43, 0.18);
+}
+
+.abstract-heading {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.abstract {
+  margin: 0;
+}
+
+.detail-link {
+  display: inline-flex;
+  margin-top: 18px;
+  color: var(--deep);
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+}
+
+.empty-state {
+  padding: 28px;
+  text-align: center;
+  border-radius: 18px;
+  border: 1px dashed var(--line);
+  color: var(--muted);
+}
+
+@media (max-width: 920px) {
+  .hero,
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-panel,
+  .filters,
+  .meta-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-shell {
+    width: min(100vw - 20px, 100%);
+    padding-top: 10px;
+  }
+
+  .hero,
+  .panel,
+  .thesis-card {
+    padding: 18px;
+    border-radius: 20px;
+  }
+}
