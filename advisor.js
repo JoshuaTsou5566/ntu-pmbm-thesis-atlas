@@ -42,6 +42,7 @@ const extractAdvisor = (item) => {
 const nodes = {
   title: document.querySelector("#advisor-name"),
   english: document.querySelector("#advisor-english"),
+  breadcrumb: document.querySelector("#advisor-breadcrumb"),
   total: document.querySelector("#advisor-total"),
   years: document.querySelector("#advisor-years"),
   themeCount: document.querySelector("#advisor-theme-count"),
@@ -149,6 +150,9 @@ const init = async () => {
   document.title = `${profile.advisor_name}｜NTU 生技管理論文地圖`;
   nodes.title.textContent = profile.advisor_name;
   nodes.english.textContent = profile.advisor_english || "";
+  if (nodes.breadcrumb) {
+    nodes.breadcrumb.textContent = profile.advisor_name;
+  }
   nodes.total.textContent = String(theses.length);
   nodes.years.textContent = `${yearCounts[0][0]} - ${yearCounts[yearCounts.length - 1][0]}`;
   nodes.themeCount.textContent = String(themeCounts.length);
