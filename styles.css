@@ -24,10 +24,15 @@ body {
   margin: 0;
   color: var(--ink);
   font-family: "Avenir Next", "Segoe UI", sans-serif;
+  line-height: 1.5;
   background:
     radial-gradient(circle at top left, rgba(210, 183, 152, 0.28), transparent 30%),
     radial-gradient(circle at top right, rgba(23, 76, 79, 0.12), transparent 22%),
     linear-gradient(180deg, #f8f3ec 0%, var(--bg) 45%, #f1ebdf 100%);
+}
+
+a {
+  color: inherit;
 }
 
 .page-shell {
@@ -54,6 +59,7 @@ body {
 }
 
 .site-brand {
+  flex: 0 0 auto;
   color: var(--deep);
   text-decoration: none;
   font-weight: 800;
@@ -61,7 +67,10 @@ body {
 }
 
 .nav-toggle {
-  display: none;
+  display: none !important;
+  appearance: none;
+  align-items: center;
+  justify-content: center;
   width: 46px;
   height: 46px;
   padding: 0;
@@ -81,17 +90,32 @@ body {
 }
 
 .site-nav-links {
-  display: flex;
+  display: flex !important;
+  flex: 1 1 auto;
   flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
   gap: 10px;
 }
 
 .site-nav-links a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
   padding: 8px 12px;
   border-radius: 999px;
   color: var(--muted);
   text-decoration: none;
   border: 1px solid transparent;
+  font-weight: 700;
+  transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease;
+}
+
+.site-nav-links a:hover {
+  background: rgba(23, 76, 79, 0.07);
+  border-color: rgba(23, 76, 79, 0.12);
+  color: var(--deep);
 }
 
 .site-nav-links a.is-active {
@@ -105,6 +129,7 @@ body {
 .breadcrumb {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
   margin: 0 0 16px;
   color: var(--muted);
@@ -117,6 +142,12 @@ body {
 }
 
 .breadcrumb strong {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 252, 247, 0.76);
+  border: 1px solid rgba(23, 76, 79, 0.1);
   color: var(--deep);
 }
 
@@ -307,6 +338,8 @@ button:hover {
 .site-footer {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 16px;
   margin-top: 32px;
   padding: 18px 4px 0;
@@ -958,19 +991,21 @@ button:hover {
   }
 
   .nav-toggle {
-    display: inline-block;
+    display: inline-flex !important;
     align-self: flex-end;
     margin-top: -52px;
   }
 
   .site-nav-links {
-    display: none;
+    display: none !important;
     width: 100%;
     flex-direction: column;
+    align-items: stretch;
+    margin-top: 8px;
   }
 
   .site-nav.is-open .site-nav-links {
-    display: flex;
+    display: flex !important;
   }
 
   .site-nav-links a {
